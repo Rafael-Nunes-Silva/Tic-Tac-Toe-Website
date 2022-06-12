@@ -1,0 +1,130 @@
+body{
+    background-color: gray;
+
+    margin: 0px;
+}
+#headerText{
+    background-color: darkslategray;
+
+    width: 100vw;
+
+    text-align: center;
+    font-size: 175px;
+
+    margin: 0px;
+}
+#gameTable{
+    background-color: darkslategray;
+
+    width: 90vw;
+    height: 90vw;
+
+    box-sizing: border-box;
+    border-radius: 25px;
+
+    white-space: nowrap;
+
+    margin: 0px 5vw;
+    padding: 0px;
+    border: 0px;
+
+    position: relative;
+    left: 0px;
+    top: 20px;
+}
+.tableButton{
+    width: 20%;
+    height: 20%;
+    box-sizing: border-box;
+    
+    margin: 0px;
+    padding: 0px;
+    border: 0px;
+
+    position: absolute;
+}
+#wlText{
+    text-align: center;
+
+    margin: 25px 50px;
+
+    font-size: 200px;
+
+    border-radius: 25px;
+}
+#restartButton{
+    background-color: darkslategray;
+    border: none;
+
+    width: 40%;
+    height: 150px;
+    
+    margin: 20px 30%;
+
+    font-size: 100px;
+
+    border-radius: 25px;
+}
+#b0{
+    width: 25vw;
+    height: 25vw;
+
+    left: 65px;
+    top: 235px;
+}
+#b1{
+    width: 25vw;
+    height: 25vw;
+
+    left: 367.5px;
+    top: 235px;
+}
+#b2{
+    width: 25vw;
+    height: 25vw;
+
+    left: 669.5px;
+    top: 235px;
+}
+#b3{
+    width: 25vw;
+    height: 25vw;
+
+    left: 65px;
+    top: 540px;
+}
+#b4{
+    width: 25vw;
+    height: 25vw;
+
+    left: 367.5px;
+    top: 540px;
+}
+#b5{
+    width: 25vw;
+    height: 25vw;
+
+    left: 669.5px;
+    top: 540px;
+}
+#b6{
+    width: 25vw;
+    height: 25vw;
+
+    left: 65px;
+    top: 845px;
+}
+#b7{
+    width: 25vw;
+    height: 25vw;
+
+    left: 367.5px;
+    top: 845px;
+}
+#b8{
+    width: 25vw;
+    height: 25vw;
+
+    left: 669.5px;
+    top: 845px;
+}

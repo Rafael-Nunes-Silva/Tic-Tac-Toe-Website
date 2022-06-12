@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<!-- TODO
+    make page responsive for larger screens
+    fix AI
+-->
+<html>
+    <head>
+        <title>Tic-Tac-Toe</title>
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body id="body" onload="setTable()">
+        <header>
+            <p id="headerText">Tic-Tac-Toe</p>
+        </header>
+        <img src="Images/Table.png" id="gameTable">
+            <img src="Images/Empty.png" id="b0" class="tableButton" onclick="userPlay(0)">
+            <img src="Images/Empty.png" id="b1" class="tableButton" onclick="userPlay(1)">
+            <img src="Images/Empty.png" id="b2" class="tableButton" onclick="userPlay(2)">
+            <br>
+            <img src="Images/Empty.png" id="b3" class="tableButton" onclick="userPlay(3)">
+            <img src="Images/Empty.png" id="b4" class="tableButton" onclick="userPlay(4)">
+            <img src="Images/Empty.png" id="b5" class="tableButton" onclick="userPlay(5)">
+            <br>
+            <img src="Images/Empty.png" id="b6" class="tableButton" onclick="userPlay(6)">
+            <img src="Images/Empty.png" id="b7" class="tableButton" onclick="userPlay(7)">
+            <img src="Images/Empty.png" id="b8" class="tableButton" onclick="userPlay(8)">
+        </img>
+        <p id="wlText"></p>
+        <button id="restartButton" onclick="restartGame()">Restart</button>
+        <script src="script.js"></script>
+    </body>
+</html>
