@@ -28,6 +28,9 @@ function clampToTableHor(i, min, max) {
     return i;
 }
 
+function setSymbol(i, symbol) {
+    table[i].style.setProperty('background-image', symbol);
+}
 function setTable() {
     for (let i = 0; i < 9; i++)
         table[i] = document.getElementById('b' + i);
@@ -142,12 +145,12 @@ function willWinIfPlayAt(i, player) {
 }
 
 function checkForWin() {
-    if (getAvailablePos() == -1)
-        endGame(DRAW);
-    else if (checkForUserWin())
+    if (checkForUserWin())
         endGame(USER);
     else if (checkForBotWin())
         endGame(BOT);
+    else if (getAvailablePos() == -1)
+        endGame(DRAW);
 }
 function checkForUserWin() {
     if (getSymbolAt(0) == X && getSymbolAt(1) == X && getSymbolAt(2) == X)
@@ -191,21 +194,25 @@ function checkForBotWin() {
 function endGame(winner) {
     switch (winner) {
         case DRAW:
+            canPlay = false;
             BODY.style.setProperty('background-color', 'gray');
-            WLTEXT.innerHTML = 'DRAW:|';
+            WLTEXT.innerHTML = 'TIE :|';
             WLTEXT.style.setProperty('color', 'black');
             break;
         case USER:
+            canPlay = false;
             BODY.style.setProperty('background-color', 'darkgreen');
-            WLTEXT.innerHTML = 'You Won:)';
+            WLTEXT.innerHTML = 'You Won :)';
             WLTEXT.style.setProperty('color', 'green');
             break;
         case BOT:
+            canPlay = false;
             BODY.style.setProperty('background-color', 'darkred');
-            WLTEXT.innerHTML = 'You Lost:(';
+            WLTEXT.innerHTML = 'You Lost :(';
             WLTEXT.style.setProperty('color', 'red');
             break;
     }
+    document.getElementById('restartButton').style.setProperty('display', 'block');
 }
 function restartGame() {
     BODY.style.setProperty('background-color', 'gray');
@@ -214,4 +221,5 @@ function restartGame() {
     for (let i = 0; i < 9; i++)
         table[i].setAttribute('src', EMPTY);
     canPlay = true;
+    document.getElementById('restartButton').style.setProperty('display', 'none');
 }
