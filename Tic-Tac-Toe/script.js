@@ -2,7 +2,7 @@ const EMPTY = 'Images/Empty.png'
 const CIRCLE = 'Images/Circle.png';
 const X = 'Images/X.png';
 
-const DRAW = 'draw';
+const TIE = 'tie';
 const USER = 'user';
 const BOT = 'bot';
 
@@ -13,64 +13,115 @@ var canPlay = true;
 
 var table = [9];
 
-function clampToTableVert(i) {
-    if (i < 0)
-        return 9 + i;
-    if (i > 8)
-        return i - 9;
-    return i;
-}
-function clampToTableHor(i, min, max) {
-    if (i < min)
-        return max;
-    if (i > max)
-        return min;
-    return i;
-}
-
-function setSymbol(i, symbol) {
-    table[i].style.setProperty('background-image', symbol);
-}
-function setTable() {
+function setupTable() {
     for (let i = 0; i < 9; i++)
         table[i] = document.getElementById('b' + i);
 }
+function clampToTableRow(pos, row) {
+    switch (row) {
+        case 1:
+            if (pos < 0)
+                return 2;
+            else if (pos > 2)
+                return 0;
+            return 1;
+        case 2:
+            if (pos < 3)
+                return 5;
+            else if (pos > 5)
+                return 3;
+            return 4;
+        case 3:
+            if (pos < 6)
+                return 8;
+            else if (pos > 8)
+                return 6;
+            return 7;
+    }
+    console.log('column index ' + row + ' not viable');
+}
+function clampToTableColumn(pos, column) {
+    switch (column) {
+        case 1:
+            if (pos < 0)
+                return 6;
+            else if (pos > 6)
+                return 0;
+            return 3;
+        case 2:
+            if (pos < 1)
+                return 7;
+            else if (pos > 7)
+                return 1;
+            return 4;
+        case 3:
+            if (pos < 2)
+                return 8;
+            else if (pos > 8)
+                return 2;
+            return 5;
+    }
+    console.log('column index ' + column + ' not viable');
+}
 
-function getAvailablePos() {
-    if (!canPlay)
-        return;
-    
-    for (let i = 0; i < 9; i++){
+function playerToSymbol(player) {
+    if (player == USER)
+        return X;
+    if (player == BOT)
+        return CIRCLE;
+    console.log('can\'t translate ' + player + ' to symbol');
+}
+function symbolToPlayer(symbol) {
+    if (symbol == X)
+        return USER;
+    if (symbol == CIRCLE)
+        return BOT;
+    console.log('can\'t translate ' + symbol + ' to user');
+}
+
+function hasAvailablePos() {
+    for (let i=0; i < 9; i++){
         if (canPlayAt(i))
-            return i;
+            return true;
+    }
+    return false;
+}
+function getRandomAvailablePos() {
+    if (!canPlay)
+        return -1;
+    
+    let positions = [0];
+    for (let i=0, j=0; i < 9; i++){
+        if (canPlayAt(i))
+            positions[j++] = i;
     }
 
-    canPlay = false;
-    return -1;
+    return positions[Math.floor(Math.random() * positions.length + 1)];
 }
-function canPlayAt(i) {
+
+function canPlayAt(pos) {
     if (!canPlay)
         return false;
     
-    return table[i].getAttribute('src') == EMPTY;
+    return table[pos].getAttribute('src') == EMPTY;
 }
-function getSymbolAt(i) {
-    return table[i].getAttribute('src');
+function getSymbolAt(pos) {
+    return table[pos].getAttribute('src');
 }
 
-function userPlay(i) {
-    if (!canPlay || !canPlayAt(i))
+function userPlay(pos) {
+    if (!canPlay || !canPlayAt(pos))
         return;
     
-    table[i].setAttribute('src', X);
+    table[pos].setAttribute('src', X);
 
     endTurn(USER);
 }
-function botPlay(i) {
-    if (!canPlay || !canPlayAt(i))
+function botPlay(pos) {
+    if (!canPlay || !canPlayAt(pos))
         return;
     
-    table[i].setAttribute('src', CIRCLE);
+    table[pos].setAttribute('src', CIRCLE);
 
     endTurn(BOT);
 }
@@ -79,20 +130,41 @@ function endTurn(lastPlayer) {
 
     if (lastPlayer == USER)
         botAI();
-        // botPlay(getAvailablePos());
+    else if (lastPlayer == BOT)
+        userAI();
 }
 
+function userAI() {
+    let availableMoves = [];
+    for (let i = 0, j=0; i < 9; i++){
+        if (canPlayAt(i)) {
+            if (willWinIfPlayAt(USER, i)) {
+                
+                userPlay(i);
+                return;
+            }
+            if (willWinIfPlayAt(BOT, i)) {
+                
+                userPlay(i);
+                return;
+            }
+            availableMoves[j++] = i;
+        }
+    }
+    
+    userPlay(availableMoves[Math.floor(Math.random() * availableMoves.length)]);
+}
 function botAI() {
     let availableMoves = [];
     for (let i = 0, j=0; i < 9; i++){
         if (canPlayAt(i)) {
-            if (willWinIfPlayAt(i, BOT)) {
-                console.log('bot will win if it plays at ' + i);
+            if (willWinIfPlayAt(BOT, i)) {
+                
                 botPlay(i);
                 return;
             }
-            if (willWinIfPlayAt(i, USER)) {
-                console.log('user will win if it plays at ' + i);
+            if (willWinIfPlayAt(USER, i)) {
+                
                 botPlay(i);
                 return;
             }
@@ -102,98 +174,86 @@ function botAI() {
     
     botPlay(availableMoves[Math.floor(Math.random() * availableMoves.length)]);
 }
-// returns if the specified player will win after playing at a specified position
-function willWinIfPlayAt(i, player) {
-    let symbol = (player == USER) ? X : CIRCLE;
-    
-    if (table[clampToTableVert(i - 3)].getAttribute('src') ==
-        table[clampToTableVert(i + 3)].getAttribute('src') == symbol)
+function willPlayerCompleteRow(player, pos) {
+    let row = 0;
+    if (pos == 0 || pos == 1 || pos == 2)
+        row = 1
+    else if (pos == 3 || pos == 4 || pos == 5)
+        row = 2;
+    else if (pos == 6 || pos == 7 || pos == 8)
+        row = 3;
+    if (playerToSymbol(player) == getSymbolAt(clampToTableRow(pos - 1, row)) &&
+        playerToSymbol(player) == getSymbolAt(clampToTableRow(pos + 1, row)))
         return true;
-    
-    switch (i) {
-        case (i >= 0 && i <= 2):
-            if (table[clampToTableHor(i - 1, 0, 2)].getAttribute('src') ==
-                table[clampToTableHor(i + 1, 0, 2)].getAttribute('src') == symbol)
-                return true;
-            break;
-        case (i >= 3 && i <= 5):
-            if (table[clampToTableHor(i - 1, 3, 5)].getAttribute('src') ==
-                table[clampToTableHor(i + 1, 3, 5)].getAttribute('src') == symbol)
-                return true;
-            break;
-        case (i >= 6 && i <= 8):
-            if (table[clampToTableHor(i - 1, 6, 8)].getAttribute('src') ==
-                table[clampToTableHor(i + 1, 6, 8)].getAttribute('src') == symbol)
-                return true;
-            break;
+    return false;
+}
+function willPlayerCompleteColumn(player, pos) {
+    let column = 0;
+    if (pos == 0 || pos == 3 || pos == 6)
+        column = 1;
+    if (pos == 1 || pos == 4 || pos == 7)
+        column = 2;
+    else if (pos == 2 || pos == 5 || pos == 8)
+        column = 3;
+    if (playerToSymbol(player) == getSymbolAt(clampToTableColumn(pos - 1, column)) &&
+        playerToSymbol(player) == getSymbolAt(clampToTableColumn(pos + 1, column)))
+        return true;
+    return false;
+}
+function willWinIfPlayAt(player, pos) {
+    let symbol = playerToSymbol(player);
+    if (willPlayerCompleteRow(player, pos))
+        return true;
+    else if (willPlayerCompleteColumn(player, pos))
+        return true;
+    else {
+        if (pos == 0 && (symbol == getSymbolAt(4) && symbol == getSymbolAt(8)))
+            return true;
+        if (pos == 2 && (symbol == getSymbolAt(4) && symbol == getSymbolAt(6)))
+            return true;
+        if (pos == 4 && (symbol == getSymbolAt(0) && symbol == getSymbolAt(8)))
+            return true;
+        if (pos == 4 && (symbol == getSymbolAt(2) && symbol == getSymbolAt(6)))
+            return true;
+        if (pos == 6 && (symbol == getSymbolAt(4) && symbol == getSymbolAt(2)))
+            return true;
+        if (pos == 8 && (symbol == getSymbolAt(4) && symbol == getSymbolAt(0)))
+            return true;
     }
-    
-    if (i == 0 && (table[4].getAttribute('src') == table[8].getAttribute('src') == symbol))
-        return true;
-    if (i == 2 && (table[4].getAttribute('src') == table[6].getAttribute('src') == symbol))
-        return true;
-    if (i == 4 && (table[0].getAttribute('src') == table[8].getAttribute('src') == symbol))
-        return true;
-    if (i == 4 && (table[2].getAttribute('src') == table[6].getAttribute('src') == symbol))
-        return true;
-    if (i == 6 && (table[4].getAttribute('src') == table[2].getAttribute('src') == symbol))
-        return true;
-    if (i == 8 && (table[4].getAttribute('src') == table[0].getAttribute('src') == symbol))
-        return true;
-    
     return false;
 }
 
 function checkForWin() {
-    if (checkForUserWin())
+    let winner = EMPTY;
+    
+    if (getSymbolAt(0) == getSymbolAt(1) && getSymbolAt(0) == getSymbolAt(2))
+        winner = getSymbolAt(0);
+    else if (getSymbolAt(3) == getSymbolAt(4) && getSymbolAt(3) == getSymbolAt(5))
+        winner = getSymbolAt(3);
+    else if (getSymbolAt(6) == getSymbolAt(7) && getSymbolAt(6) == getSymbolAt(8))
+        winner = getSymbolAt(6);
+    else if (getSymbolAt(0) == getSymbolAt(3) && getSymbolAt(0) == getSymbolAt(6))
+        winner = getSymbolAt(0);
+    else if (getSymbolAt(1) == getSymbolAt(4) && getSymbolAt(1) == getSymbolAt(7))
+        winner = getSymbolAt(1);
+    else if (getSymbolAt(2) == getSymbolAt(5) && getSymbolAt(2) == getSymbolAt(8))
+        winner = getSymbolAt(2);
+    else if (getSymbolAt(0) == getSymbolAt(4) && getSymbolAt(0) == getSymbolAt(8))
+        winner = getSymbolAt(0);
+    else if (getSymbolAt(2) == getSymbolAt(4) && getSymbolAt(2) == getSymbolAt(6))
+        winner = getSymbolAt(2);
+    
+    if (winner == X)
         endGame(USER);
-    else if (checkForBotWin())
+    else if (winner == CIRCLE)
         endGame(BOT);
-    else if (getAvailablePos() == -1)
-        endGame(DRAW);
-}
-function checkForUserWin() {
-    if (getSymbolAt(0) == X && getSymbolAt(1) == X && getSymbolAt(2) == X)
-        return true;
-    else if (getSymbolAt(3) == X && getSymbolAt(4) == X && getSymbolAt(5) == X)
-        return true;
-    else if (getSymbolAt(6) == X && getSymbolAt(7) == X && getSymbolAt(8) == X)
-        return true;
-    else if (getSymbolAt(0) == X && getSymbolAt(3) == X && getSymbolAt(6) == X)
-        return true;
-    else if (getSymbolAt(1) == X && getSymbolAt(4) == X && getSymbolAt(7) == X)
-        return true;
-    else if (getSymbolAt(2) == X && getSymbolAt(5) == X && getSymbolAt(8) == X)
-        return true;
-    else if (getSymbolAt(0) == X && getSymbolAt(4) == X && getSymbolAt(8) == X)
-        return true;
-    else if (getSymbolAt(6) == X && getSymbolAt(4) == X && getSymbolAt(2) == X)
-        return true;
-    return false;
-}
-function checkForBotWin() {
-    if (getSymbolAt(0) == CIRCLE && getSymbolAt(1) == CIRCLE && getSymbolAt(2) == CIRCLE)
-        return true;
-    else if (getSymbolAt(3) == CIRCLE && getSymbolAt(4) == CIRCLE && getSymbolAt(5) == CIRCLE)
-        return true;
-    else if (getSymbolAt(6) == CIRCLE && getSymbolAt(7) == CIRCLE && getSymbolAt(8) == CIRCLE)
-        return true;
-    else if (getSymbolAt(0) == CIRCLE && getSymbolAt(3) == CIRCLE && getSymbolAt(6) == CIRCLE)
-        return true;
-    else if (getSymbolAt(1) == CIRCLE && getSymbolAt(4) == CIRCLE && getSymbolAt(7) == CIRCLE)
-        return true;
-    else if (getSymbolAt(2) == CIRCLE && getSymbolAt(5) == CIRCLE && getSymbolAt(8) == CIRCLE)
-        return true;
-    else if (getSymbolAt(0) == CIRCLE && getSymbolAt(4) == CIRCLE && getSymbolAt(8) == CIRCLE)
-        return true;
-    else if (getSymbolAt(6) == CIRCLE && getSymbolAt(4) == CIRCLE && getSymbolAt(2) == CIRCLE)
-        return true;
-    return false;
+    else if (!hasAvailablePos())
+        endGame(TIE);
 }
 
 function endGame(winner) {
     switch (winner) {
-        case DRAW:
+        case TIE:
             canPlay = false;
             BODY.style.setProperty('background-color', 'gray');
             WLTEXT.innerHTML = 'TIE :|';
