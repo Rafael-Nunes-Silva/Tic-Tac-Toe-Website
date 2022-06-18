@@ -130,30 +130,8 @@ function endTurn(lastPlayer) {
 
     if (lastPlayer == USER)
         botAI();
-    else if (lastPlayer == BOT)
-        userAI();
 }
 
-function userAI() {
-    let availableMoves = [];
-    for (let i = 0, j=0; i < 9; i++){
-        if (canPlayAt(i)) {
-            if (willWinIfPlayAt(USER, i)) {
-                
-                userPlay(i);
-                return;
-            }
-            if (willWinIfPlayAt(BOT, i)) {
-                
-                userPlay(i);
-                return;
-            }
-            availableMoves[j++] = i;
-        }
-    }
-    
-    userPlay(availableMoves[Math.floor(Math.random() * availableMoves.length)]);
-}
 function botAI() {
     let availableMoves = [];
     for (let i = 0, j=0; i < 9; i++){
