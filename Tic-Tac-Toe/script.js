@@ -10,6 +10,7 @@ const BODY = document.getElementById('body');
 const WLTEXT = document.getElementById('wlText');
 
 var canPlay = true;
+var lastWinner = TIE;
 
 var table = [9];
 
@@ -250,6 +251,7 @@ function endGame(winner) {
             WLTEXT.style.setProperty('color', 'red');
             break;
     }
+    lastWinner = winner;
     document.getElementById('restartButton').style.setProperty('display', 'block');
 }
 function restartGame() {
@@ -260,4 +262,6 @@ function restartGame() {
         table[i].setAttribute('src', EMPTY);
     canPlay = true;
     document.getElementById('restartButton').style.setProperty('display', 'none');
+    if (lastWinner == USER)
+        botAI();
 }
