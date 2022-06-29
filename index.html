@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Tic-Tac-Toe</title>
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body id="body" onload="setupTable()">
+        <header>
+            <p id="headerText">Tic-Tac-Toe</p>
+        </header>
+        <div class="flex-container">
+            <img src="Images/Empty.png" id="b0" onclick="userPlay(0)">
+            <img src="Images/Empty.png" id="b1" onclick="userPlay(1)">
+            <img src="Images/Empty.png" id="b2" onclick="userPlay(2)"><br>
+            <img src="Images/Empty.png" id="b3" onclick="userPlay(3)">
+            <img src="Images/Empty.png" id="b4" onclick="userPlay(4)">
+            <img src="Images/Empty.png" id="b5" onclick="userPlay(5)"><br>
+            <img src="Images/Empty.png" id="b6" onclick="userPlay(6)">
+            <img src="Images/Empty.png" id="b7" onclick="userPlay(7)">
+            <img src="Images/Empty.png" id="b8" onclick="userPlay(8)">
+        </div>
+        <p id="wlText"></p>
+        <button id="restartButton" onclick="restartGame()">Restart</button>
+        <footer>
+            <p>Made By <a href="https://github.com/Rafael-Nunes-Silva" target="_blank">Rafael-Nunes-Silva</a></p>
+        </footer>
+        <script src="script.js"></script>
+    </body>
+</html>
