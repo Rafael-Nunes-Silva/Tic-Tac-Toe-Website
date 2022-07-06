@@ -138,19 +138,20 @@ function botAI() {
     for (let i = 0, j=0; i < 9; i++){
         if (canPlayAt(i)) {
             if (willWinIfPlayAt(BOT, i)) {
-                
                 botPlay(i);
                 return;
             }
             if (willWinIfPlayAt(USER, i)) {
-                
                 botPlay(i);
                 return;
             }
             availableMoves[j++] = i;
         }
     }
-    
+    if(canPlayAt(4)){
+        botPlay(4);
+        return;
+    }
     botPlay(availableMoves[Math.floor(Math.random() * availableMoves.length)]);
 }
 function willPlayerCompleteRow(player, pos) {
